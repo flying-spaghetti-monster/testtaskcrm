@@ -1,5 +1,6 @@
 import axios from 'axios';
-import type { Customer, Order } from '../types/global';
+import type { Customer, Order, ResponseCustomer } from '../types/global';
+import toast from 'react-hot-toast';
 
 const API_BASE = 'http://localhost:3000';
 
@@ -11,20 +12,26 @@ type FetchCustomersParams = {
   city?: string;
 };
 
-type ResponseCustomer = { customers: Customer[], total: number };
 
 export async function fetchCustomers(params: FetchCustomersParams = {}): Promise<ResponseCustomer> {
   const { page = 0, limit = 20, gender, country, city } = params;
 
-  const response = await axios.get<ResponseCustomer>(`${API_BASE}/customers`, {
-    params: {
-      skip: page * limit,
-      take: limit,
-      gender,
-      country,
-      city,
-    },
-  });
+  const response = await toast.promise(
+    axios.get<ResponseCustomer>(`${API_BASE}/customers`, {
+      params: {
+        skip: page * limit,
+        take: limit,
+        gender,
+        country,
+        city,
+      },
+    }),
+    {
+      loading: 'Loading customers...',
+      success: 'Loaded customers successfully',
+      error: 'Error loading customers',
+    }
+  );
 
   return {
     customers: response.data.customers,

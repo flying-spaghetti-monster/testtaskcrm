@@ -1,10 +1,7 @@
-import { createContext, useContext, useState, useCallback, useMemo, useEffect } from "react";
-// import { PageDirection, CategoryResponse, Actions } from '../lib/types';
-// import { useQuery } from '@tanstack/react-query';
-// import toast from 'react-hot-toast';
-// import { instance as axios } from '../api/axios';
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { fetchCustomers } from '../api/customers';
-import type { Customer } from '../types/global';
+import type { Customer, ResponseCustomer } from '../types/global';
+import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 
 type Filters = {
   gender?: string;
@@ -29,65 +26,68 @@ export const useDashboardPage = () => {
   return context;
 };
 
-export const DashboardPageProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+export const DashboardPageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [filters, setFilters] = useState<Filters>({});
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
 
-  const loadMore = async (reset: boolean = false) => {
-    if (loading) return;
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    refetch,
+  } = useInfiniteQuery<
+    ResponseCustomer,
+    Error,
+    InfiniteData<ResponseCustomer>,
+    [string, Filters],
+    number
+  >({
+    queryKey: ["customers", filters],
+    queryFn: ({ pageParam = 0 }) => fetchCustomers({ page: pageParam, ...filters }),
+    getNextPageParam: (lastPage, allPages) => {
+      const totalFetched = allPages.flatMap(p => p.customers).length;
+      return totalFetched < lastPage.total ? allPages.length : undefined;
+    },
+    staleTime: 1000 * 60 * 5,
+    initialPageParam: 0,
+  });
 
-    setLoading(true);
+  const handleFilterChange = useCallback(
+    (key: keyof Filters, value: string | undefined) => {
+      setFilters(prev => ({ ...prev, [key]: value }));
+      refetch();
+    },
+    [refetch]
+  );
 
-    const nextPage = reset ? 0 : page;
-    const data = await fetchCustomers({ page: nextPage, ...filters });
+  const customers = useMemo(
+    () => data?.pages.flatMap((p: ResponseCustomer) => p.customers) || [],
+    [data]
+  );
 
-    if (reset) {
-      console.log(data)
-      setCustomers(data.customers);
-      setPage(1);
-      setHasMore(data.total > 0);
-    } else {
-      setCustomers([...customers, ...data.customers]);
-      setPage(nextPage + 1);
-      if (data.total === 0) setHasMore(false);
-    }
-
-    setLoading(false);
-  };
-
-  const handleFilterChange = useCallback((key: keyof Filters, value: string | undefined) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  }, []);
-
-  useEffect(() => {
-    loadMore(true);
-  }, [filters.gender, filters.country, filters.city]);
+  const loadMore = useCallback(
+    (reset: boolean) => {
+      if (reset) {
+        refetch();
+      } else {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, refetch]
+  );
 
   const contextValue = useMemo(
     () => ({
       customers,
-      hasMore,
+      hasMore: !!hasNextPage,
       loadMore,
+      isLoading,
+      isFetchingNextPage,
       handleFilterChange,
     }),
-    [
-      customers,
-      hasMore,
-      loadMore,
-      handleFilterChange
-    ]
+    [customers, hasNextPage, loadMore, handleFilterChange]
   );
 
-  return (
-    <DashboardPageContext.Provider
-      value={contextValue}
-    >
-      {children}
-    </DashboardPageContext.Provider>
-  );
+  return <DashboardPageContext.Provider value={contextValue}>{children}</DashboardPageContext.Provider>;
 };

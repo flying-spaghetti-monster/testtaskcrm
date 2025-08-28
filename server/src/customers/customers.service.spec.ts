@@ -8,8 +8,32 @@ describe('CustomersService', () => {
   let prisma: PrismaService;
 
   const mockCustomers: Partial<Customers>[] = [
-    { id: 1, firstName: 'John', lastName: 'Doe', email: 'john@example.com', gender: 'Male', country: 'USA', city: 'NY' },
-    { id: 2, firstName: 'Jane', lastName: 'Smith', email: 'jane@example.com', gender: 'Female', country: 'USA', city: 'LA' },
+    {
+      id: 1,
+      firstName: "Adelle",
+      lastName: "Summers",
+      email: "bookings2032@example.com",
+      gender: "Other",
+      country: "Greenland",
+      city: "Altamonte Springs",
+      state: "Delaware",
+      postCode: "83892",
+      street: "Letterman Hospital Access",
+      streetNumber: "1279"
+    },
+    {
+      id: 2,
+      firstName: "Sixta",
+      lastName: "Dean",
+      email: "phoenix2098@gmail.com",
+      gender: "Fluid",
+      country: "Czech Republic",
+      city: "Coconut Creek",
+      state: "Washington",
+      postCode: "33093",
+      street: "Mahan",
+      streetNumber: "133"
+    },
   ];
 
   beforeEach(async () => {

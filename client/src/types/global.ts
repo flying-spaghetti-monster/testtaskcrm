@@ -23,3 +23,5 @@ export type Order = {
   createdAt: Date;
   shippedAt: Date;
 };
+
+export type ResponseCustomer = { customers: Customer[], total: number };

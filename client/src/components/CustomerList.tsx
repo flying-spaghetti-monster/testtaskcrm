@@ -9,19 +9,19 @@ type CustomerListProps = {
   loadMore: () => void,
 };
 
-export function CustomerList({ customers, loadMore, hasMore }: CustomerListProps) {
+export const CustomerList: React.FC<CustomerListProps> = ({ customers, hasMore, loadMore }) => {
+  const itemCount = hasMore ? customers.length + 1 : customers.length;
+
+  const isItemLoaded = (index: number) => !hasMore || index < customers.length;
+
   return (
-    <InfiniteLoader
-      isItemLoaded={(index) => !!customers[index]}
-      itemCount={hasMore ? customers.length + 1 : customers.length}
-      loadMoreItems={loadMore}
-    >
+    <InfiniteLoader isItemLoaded={isItemLoaded} itemCount={itemCount} loadMoreItems={loadMore}>
       {({ onItemsRendered, ref }) => (
         <List
           height={600}
-          itemCount={customers.length}
-          itemSize={80}
           width="100%"
+          itemCount={itemCount}
+          itemSize={80}
           onItemsRendered={onItemsRendered}
           ref={ref}
         >
@@ -31,11 +31,11 @@ export function CustomerList({ customers, loadMore, hasMore }: CustomerListProps
                 <CustomerCard customer={customers[index]} />
               </div>
             ) : (
-              <div style={style}>Loading...</div>
+              <div style={{ ...style, textAlign: "center", lineHeight: "80px" }}>Loading...</div>
             )
           }
         </List>
       )}
     </InfiniteLoader>
   );
-}
+};

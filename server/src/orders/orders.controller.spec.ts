@@ -7,7 +7,17 @@ describe('OrdersController', () => {
   let service: OrdersService;
 
   const mockOrders = [
-    { id: 1, number: 1, price: 100, currency: 'USD', itemName: 'Item A', amount: 2, customerId: 1, createdAt: new Date('2025-01-01'), shippedAt: new Date('2025-01-02') },
+    {
+      id: 1,
+      number: 1,
+      price: 562.04,
+      currency: 'USD',
+      itemName: 'Item A',
+      amount: 2,
+      customerId: 1,
+      createdAt: new Date('2025-01-01'),
+      shippedAt: new Date('2025-01-03')
+    },
   ];
 
   const mockOrdersService = {

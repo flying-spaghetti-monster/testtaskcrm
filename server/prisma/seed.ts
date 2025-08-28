@@ -54,7 +54,7 @@ async function fillCustomers(): Promise<void> {
     skipDuplicates: true,
   });
 
-  console.log('✅ Customers inserted');
+  console.log('Customers inserted');
 }
 
 function randomInt(min: number, max: number): number {
