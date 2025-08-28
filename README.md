@@ -13,8 +13,9 @@
 
 ## How to run
 
-### 1. PostgreSQL
+
 ```bash
+### 1. PostgreSQL
 docker-compose up -d
 
 ## server 
@@ -24,12 +25,13 @@ npx prisma generate
 npx prisma db seed
 npm run build
 npm run start
+
 ## client
 cd client
 npm install
 npm run build
 npm run start
-
+```
 ## result
-  ![alt text](image-2.png)
-  ![alt text](image-3.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
