@@ -15,6 +15,8 @@
 
 
 ```bash
+copy .env.example to .env
+
 ### 1. PostgreSQL
 docker-compose up -d
 
@@ -22,6 +24,7 @@ docker-compose up -d
 cd server
 npm install
 npx prisma generate
+npx prisma db push
 npx prisma db seed
 npm run build
 npm run start

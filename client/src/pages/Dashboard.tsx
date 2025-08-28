@@ -4,6 +4,7 @@ import { CountryFilter } from '../components/filters/CountryFilter';
 import { CityFilter } from '../components/filters/CityFilter';
 import { useDashboardPage } from '../context/DashboardPageContext';
 import { Card, CardContent, Grid } from '@mui/material';
+import toast, { Toaster } from 'react-hot-toast';
 
 export function Dashboard() {
   const {
@@ -30,6 +31,11 @@ export function Dashboard() {
           <CustomerList customers={customers} loadMore={() => loadMore(false)} hasMore={hasMore} />
         </CardContent>
       </Card>
+      <Toaster toastOptions={{
+        style: {
+          zIndex: 9999, // higher than modal (adjust as needed)
+        },
+      }} />
     </Grid>
 
   );
