@@ -5,8 +5,8 @@ import type { Customer } from '../types/global';
 
 type CustomerListProps = {
   customers: Customer[];
-  loadMore: () => void;
   hasMore: boolean;
+  loadMore: () => void,
 };
 
 export function CustomerList({ customers, loadMore, hasMore }: CustomerListProps) {

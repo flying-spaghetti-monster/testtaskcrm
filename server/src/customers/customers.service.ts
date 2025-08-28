@@ -7,14 +7,17 @@ import { GetCategoriesDto } from './dto/get-customer.dto';
 export class CustomersService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async findAll(params: GetCategoriesDto): Promise<Partial<Customers>[]> {
+  async findAll(params: GetCategoriesDto): Promise<{
+    customers: Partial<Customers>[],
+    total: number
+  }> {
     const { skip, take, ...filters } = params;
 
     const where = Object.fromEntries(
       Object.entries(filters).filter(([_, v]) => v !== undefined && v !== null)
     );
 
-    return await this.prisma.customers.findMany({
+    const customers = await this.prisma.customers.findMany({
       select: {
         id: true,
         firstName: true,
@@ -28,6 +31,16 @@ export class CustomersService {
       take,
       where,
     });
+
+
+    const total = await this.prisma.customers.count({
+      where,
+    });
+
+    return {
+      customers,
+      total,
+    }
   }
 
   async findOne(id: number): Promise<Customers | null> {

@@ -11,10 +11,12 @@ type FetchCustomersParams = {
   city?: string;
 };
 
-export async function fetchCustomers(params: FetchCustomersParams = {}): Promise<Customer[]> {
+type ResponseCustomer = { customers: Customer[], total: number };
+
+export async function fetchCustomers(params: FetchCustomersParams = {}): Promise<ResponseCustomer> {
   const { page = 0, limit = 20, gender, country, city } = params;
 
-  const response = await axios.get<Customer[]>(`${API_BASE}/customers`, {
+  const response = await axios.get<ResponseCustomer>(`${API_BASE}/customers`, {
     params: {
       skip: page * limit,
       take: limit,
@@ -24,7 +26,10 @@ export async function fetchCustomers(params: FetchCustomersParams = {}): Promise
     },
   });
 
-  return response.data;
+  return {
+    customers: response.data.customers,
+    total: response.data.total
+  }
 }
 
 export async function fetchCustomerDetails(id: string): Promise<Customer> {

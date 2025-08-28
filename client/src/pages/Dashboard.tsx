@@ -1,65 +1,36 @@
-import { useEffect, useState } from 'react';
 import { CustomerList } from '../components/CustomerList';
 import { GenderFilter } from '../components/filters/GenderFilter';
 import { CountryFilter } from '../components/filters/CountryFilter';
 import { CityFilter } from '../components/filters/CityFilter';
-import { fetchCustomers } from '../api/customers';
-import type { Customer } from '../types/global';
-
-type Filters = {
-  gender?: string;
-  country?: string;
-  city?: string;
-};
+import { useDashboardPage } from '../context/DashboardPageContext';
+import { Card, CardContent, Grid } from '@mui/material';
 
 export function Dashboard() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [filters, setFilters] = useState<Filters>({});
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-
-  // функция загрузки данных
-  const loadMore = async (reset: boolean = false) => {
-    if (loading) return;
-
-    setLoading(true);
-
-    const nextPage = reset ? 0 : page;
-    const data = await fetchCustomers({ page: nextPage, ...filters });
-
-    if (reset) {
-      setCustomers(data);
-      setPage(1);
-      setHasMore(data.length > 0);
-    } else {
-      setCustomers([...customers, ...data]);
-      setPage(nextPage + 1);
-      if (data.length === 0) setHasMore(false);
-    }
-
-    setLoading(false);
-  };
-
-  const handleFilterChange = (key: keyof Filters, value: string | undefined) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  console.log(filters);
-
-  useEffect(() => {
-    loadMore(true);
-  }, [filters.gender, filters.country, filters.city]);
+  const {
+    customers,
+    hasMore,
+    loadMore,
+    handleFilterChange,
+  } = useDashboardPage();
 
   return (
-    <div className="p-4 flex flex-col gap-4">
-      <div className="grid grid-cols-3 gap-4">
-        <GenderFilter onChange={(value) => handleFilterChange("gender", value || undefined)} />
-        <CountryFilter onChange={(value) => handleFilterChange("country", value || undefined)} />
-        <CityFilter onChange={(value) => handleFilterChange("city", value || undefined)} />
-      </div>
+    <Grid container columns={1}
+      justifyContent="center"
+      alignItems="center"
+      style={{ minHeight: "100vh", padding: "2rem 0" }}
+    >
+      <Card className="shadow-lg rounded-2xl">
+        <CardContent className="p-6">
+          <GenderFilter onChange={(value) => handleFilterChange("gender", value || undefined)} />
+          <CountryFilter onChange={(value) => handleFilterChange("country", value || undefined)} />
+          <CityFilter onChange={(value) => handleFilterChange("city", value || undefined)} />
+        </CardContent>
 
-      <CustomerList customers={customers} loadMore={loadMore} hasMore={hasMore} />
-    </div>
+        <CardContent className="p-6">
+          <CustomerList customers={customers} loadMore={() => loadMore(false)} hasMore={hasMore} />
+        </CardContent>
+      </Card>
+    </Grid>
+
   );
 }
