@@ -4,7 +4,7 @@ import { CountryFilter } from '../components/filters/CountryFilter';
 import { CityFilter } from '../components/filters/CityFilter';
 import { useDashboardPage } from '../context/DashboardPageContext';
 import { Card, CardContent, Grid } from '@mui/material';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 export function Dashboard() {
   const {
